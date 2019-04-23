@@ -99,6 +99,43 @@ int getEasterDay(int year) {
   return easterDate;
 }
 
+int getMoonPhase(int d, int m, int y) {
+    /*
+      calculates the moon phase (0-7), accurate to 1 segment.
+      0 = > new moon.
+      4 => full moon.
+      */
+
+    int c,e;
+    double jd;
+    int b;
+
+    if (m < 3) {
+        y--;
+        m += 12;
+    }
+    ++m;
+    c = 365.25*y;
+    e = 30.6*m;
+    jd = c+e+d-694039.09;  /* jd is total days elapsed */
+    jd /= 29.53;           /* divide by the moon cycle (29.53 days) */
+    b = jd;		   /* int(jd) -> b, take integer part of jd */
+    jd -= b;		   /* subtract integer part to leave fractional part of original jd */
+    b = jd*8 + 0.5;	   /* scale fraction from 0-8 and round by adding 0.5 */
+    b = b & 7;		   /* 0 and 8 are the same so turn 8 into 0 */
+    return b;
+}
+
+int showFulledMoon(int year) {
+  int moon, day, month;
+  for(month = 0; month < 12; month ++) {
+    for(day = 0; day < monthDays[isLeapYear(year)][month]; day++) {
+      moon = getMoonPhase(day+1, month+1, year);
+      if(moon == 6) printHoliday(day+1, month+1, year, "Lua Cheia");
+    }
+  }
+}
+
 void getYearHolidays(int year) {
   if (year < 0001 || year > 5000) {
     printf("Infelizmente os calculos de datas não são válidas para o ano informado.");
@@ -117,5 +154,8 @@ void getYearHolidays(int year) {
   int easterDay = getEasterDay(year);
   printHoliday(20, 8, year, "Aniversário da cidade São Bernardo do Campo");
   printHoliday(25, 12, year, "Natal");
+
+  printf("\n-- Dias de Lua Cheia --\n");
+  showFulledMoon(year);
 
 }
