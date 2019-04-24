@@ -1,4 +1,4 @@
-char weekDays[7][13] = {
+char weekDays[7][15] = {
   "Domingo",
   "Segunda-Feira", 
   "Terça-Feira",
@@ -100,40 +100,48 @@ int getEasterDay(int year) {
 }
 
 int getMoonPhase(int d, int m, int y) {
-    /*
-      calculates the moon phase (0-7), accurate to 1 segment.
-      0 = > new moon.
-      4 => full moon.
-      */
+  int b, c, e;
+  double jd;
 
-    int c,e;
-    double jd;
-    int b;
-
-    if (m < 3) {
-        y--;
-        m += 12;
-    }
-    ++m;
-    c = 365.25*y;
-    e = 30.6*m;
-    jd = c+e+d-694039.09;  /* jd is total days elapsed */
-    jd /= 29.53;           /* divide by the moon cycle (29.53 days) */
-    b = jd;		   /* int(jd) -> b, take integer part of jd */
-    jd -= b;		   /* subtract integer part to leave fractional part of original jd */
-    b = jd*8 + 0.5;	   /* scale fraction from 0-8 and round by adding 0.5 */
-    b = b & 7;		   /* 0 and 8 are the same so turn 8 into 0 */
-    return b;
+  if (m < 3) {
+    y--;
+    m += 12;
+  }
+  ++m;
+  c = 365.25 * y;
+  e = 30.6 * m;
+  jd = c + e + d - 694039.09;
+  jd /= 29.53;
+  b = jd;
+  jd -= b;
+  b = jd * 8 + 0.5;
+  b = b & 7;
+  return b;
 }
 
 int showFulledMoon(int year) {
   int moon, day, month;
+  printf("\n-- Dias de Lua Cheia --\n");
   for(month = 0; month < 12; month ++) {
     for(day = 0; day < monthDays[isLeapYear(year)][month]; day++) {
       moon = getMoonPhase(day+1, month+1, year);
       if(moon == 6) printHoliday(day+1, month+1, year, "Lua Cheia");
     }
   }
+}
+
+int showSeaons(int year) {
+  printf("\n-- Estacoes --\n");
+  printHoliday(20, 03, year, "Inicio do Outono");
+  printHoliday(21, 06, year, "Inicio do Inverno");
+  printHoliday(23, 9, year, "Inicio da Primaveira");
+  printHoliday(21, 12, year, "Inicio do Verão");
+}
+
+int showEquinox(int year) {
+  printf("\n");
+  printHoliday(20, 03, year, "Equinocio de Outono");
+  printHoliday(23, 8 + 01, year, "Equinocio de Primaveira");
 }
 
 void getYearHolidays(int year) {
@@ -155,7 +163,7 @@ void getYearHolidays(int year) {
   printHoliday(20, 8, year, "Aniversário da cidade São Bernardo do Campo");
   printHoliday(25, 12, year, "Natal");
 
-  printf("\n-- Dias de Lua Cheia --\n");
   showFulledMoon(year);
-
+  showSeaons(year);
+  showEquinox(year);
 }
